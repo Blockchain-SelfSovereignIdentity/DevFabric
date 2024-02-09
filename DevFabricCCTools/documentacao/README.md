@@ -44,32 +44,88 @@ Estes são todos os elementos necessários para utilizar as principais funções
 
 ## Configuração do Ambiente
 Os seguintes sistemas, plataformas e linguagens devem estar instalados:
-
-* Docker 19+
+#### 
 ```shell
-matheuslazaro@matheuslazaro:~/cc-tools-demo$ docker -v
-Docker version 19.03.12, build 48a66213fe
-```
-* GCC
-```shell
-matheuslazaro@matheuslazaro:~/cc-tools-demo$ gcc --version
-gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0
-Copyright (C) 2021 Free Software Foundation, Inc.
-This is free software; see the source for copying conditions.  There is NO
-warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+sudo apt-get install git curl jq
 ```
 
-* GoLang 1.14+
+#### docker
 ```shell
-matheuslazaro@matheuslazaro:~/cc-tools-demo$ go version
-go version go1.15.2 linux/amd64
+# Remover versão antiga do Docker:
+sudo apt-get remove docker
+sudo apt-get remove docker-ce
+sudo apt-get remove docker-ce-cli
+sudo apt-get purge docker.io
+sudo apt-get autoremove --purge docker.io
+sudo rm -rf /var/lib/docker
+sudo groupdel docker
+sudo rm -rf /etc/docker
+sudo rm /usr/bin/docker
+sudo rm /snap/bin/docker
+sudo rm /usr/bin/dockerd
+sudo rm /etc/apt/sources.list.d/docker.list
+
+
+
+matheuslazaro@matheusLazaro:~$ sudo apt-get install docker
+matheuslazaro@matheusLazaro:~$ sudo apt  install docker.io
+matheuslazaro@matheusLazaro:~$ sudo usermod -aG docker $USER
+matheuslazaro@matheusLazaro:~$ sudo apt-get install containerd
+matheuslazaro@matheusLazaro:~$ echo $USER
+matheuslazaro@matheusLazaro:~$ docker --version
+Docker version 24.0.5, build 24.0.5-0ubuntu1~22.04.1
+matheuslazaro@matheusLazaro:~$ docker ps
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+
+# Verificação (Se necessário, reiniciar a VM):
+docker --version
+Docker version 24.0.5, build 24.0.5-0ubuntu1~22.04.1
+docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
 ```
 
-* NodeJs 10+
+#### Docker compose
 ```shell
-matheuslazaro@matheuslazaro:~/cc-tools-demo$ node -v
-v12.18.2
+# Remover versão antiga:
+sudo apt-get remove docker-compose
+sudo rm /usr/local/bin/docker-compose
+
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+sudo chmod +x /usr/local/bin/docker-compose
+export PATH=$PATH:/usr/local/bin
+export PATH=$PATH:/snap/bin
+
+# Atualizar biblioteca paramiko
+pip install --upgrade paramiko
+
+
+docker-compose -v
+docker-compose version 1.29.2, build 5becea4c
 ```
+
+#### Node.js 12.18.2 e npm 6.14.5(Versão suportada)
+* Instalação
+```shell
+sudo apt-get remove nodejs
+
+sudo apt-get install npm
+sudo npm install -g n
+sudo rm /usr/bin/node
+sudo n 12.18.2
+sudo ln -s /usr/local/bin/node /usr/bin/node
+```
+
+* Verificação:
+    ```shell
+   node -v
+    v12.18.2
+
+    npm --version
+    6.14.5
+    ```
+
+
 * Hyperledger Fabric 2.5
 
 Se estiver usando o Linux Ubuntu, execute o seguinte comando a partir do diretório raiz. Isso irá baixar e instalar os sistemas acima antes de iniciar o desenvolvimento.
