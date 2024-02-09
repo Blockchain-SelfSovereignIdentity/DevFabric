@@ -1,4 +1,351 @@
 # CC-Tools
+# Getting Started
+# GoLedger CC-Tools
+
+O GoLedger CC-Tools é uma biblioteca desenvolvida para ser utilizada no sistema operacional Linux.
+
+Geralmente, utilizamos a distribuição Ubuntu 18+, no entanto, a biblioteca é compatível com outros ambientes, podendo ser necessários alguns ajustes.
+
+#### Versão utilizada:
+```shell
+No LSB modules are available.
+Distributor ID: Ubuntu
+Description:    Ubuntu 22.04.1 LTS
+Release:        22.04
+Codename:       jammy
+```
+
+## Download e Configuração
+
+Para aprender como utilizar a biblioteca GoLedger CC-Tools, faça o download do repositório de código de demonstração disponível no GitHub.
+
+```bash
+cd $HOME
+git clone https://github.com/hyperledger-labs/cc-tools-demo.git
+cd cc-tools-demo
+```
+## Estrutura de Pastas
+
+```go
+. // pasta raiz do cc-tools-demo
+|          
+├── ccapi               // Código da API Rest (servidor Golang Gin) 
+|
+├── chaincode           // Código do Smart Contract (GoLang) 
+|   └── assettypes      // Definições de Ativos
+|   └── eventtypes      // Definições de Eventos
+|   └── txdefs          // Transações Blockchain
+|   └── datatypes       // Tipos de dados personalizados 
+|
+├── fabric              // Artefatos do Hyperledger Fabric 
+```
+
+Estes são todos os elementos necessários para utilizar as principais funções da biblioteca.
+
+## Configuração do Ambiente
+Os seguintes sistemas, plataformas e linguagens devem estar instalados:
+
+* Docker 19+
+```shell
+matheuslazaro@matheuslazaro:~/cc-tools-demo$ docker -v
+Docker version 19.03.12, build 48a66213fe
+```
+* GCC
+```shell
+matheuslazaro@matheuslazaro:~/cc-tools-demo$ gcc --version
+gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0
+Copyright (C) 2021 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+```
+
+* GoLang 1.14+
+```shell
+matheuslazaro@matheuslazaro:~/cc-tools-demo$ go version
+go version go1.15.2 linux/amd64
+```
+
+* NodeJs 10+
+```shell
+matheuslazaro@matheuslazaro:~/cc-tools-demo$ node -v
+v12.18.2
+```
+* Hyperledger Fabric 2.5
+
+Se estiver usando o Linux Ubuntu, execute o seguinte comando a partir do diretório raiz. Isso irá baixar e instalar os sistemas acima antes de iniciar o desenvolvimento.
+
+```shell
+sudo ./scripts/installPreReqUbuntu.sh
+```
+
+Ver se é necessário:
+```go
+# Baixar o arquivo tarball do GoLang 1.14+
+wget https://dl.google.com/go/go1.14.3.linux-amd64.tar.gz
+
+# Extrair o arquivo tarball na pasta /usr/local
+sudo tar -C /usr/local -xvf go1.14.3.linux-amd64.tar.gz
+
+# Adicionar o caminho /usr/local/go/bin à variável de ambiente PATH
+echo "export PATH=$PATH:/usr/local/go/bin" >> $HOME/.profile
+
+# Recarregar o arquivo .profile para aplicar as mudanças
+source $HOME/.profile
+
+# Verificar se a instalação foi bem-sucedida
+go version
+
+sudo export PATH=$PATH:/usr/local/go/bin
+
+sudo su
+export PATH=$PATH:/usr/local/go/bin
+```
+
+Ao final, a seguinte mensagem de sucesso deve aparecer:
+
+Eviroment configured
+
+Agora você está pronto para Escrever Sua Primeira Aplicação.
+
+
+
+
+
+
+
+
+
+
+
+# Tutoriais
+## Escrevendo Sua Primeira Aplicação
+
+Este tutorial mostrará como instalar e usar um smart contract (chaincode).
+
+Antes de começar, é necessário ter configurado o ambiente. Detalhes podem ser encontrados em [Getting Started](#getting-started).
+
+Vamos entender como a biblioteca GoLedger CC-Tools funciona, utilizando os artefatos fornecidos pela GoLedger.
+
+### Integração CCAPI
+### Atualização da API Hyperledger Fabric
+### Desenvolvimento da Aplicação Web (cc-web)
+
+O smart contract no repositório cc-tools-demo é ideal para iniciantes no desenvolvimento de tecnologia Hyperledger Fabric. É um excelente ponto de partida para compreender uma blockchain Hyperledger Fabric e facilitar o desenvolvimento de aplicações usando esse framework.
+
+Você aprenderá como escrever uma aplicação e um smart contract (chaincode) para consultar e atualizar um ledger, e como se conectar à Blockchain através de uma API pronta para uso.
+
+**NOTA:**
+
+É necessário conhecer a linguagem de programação GoLang para completar este tutorial.
+
+### Detalhes da Rede
+
+A rede padrão a ser criada terá a seguinte configuração:
+
+- 1 chaincode (cc-tools-demo)
+- 3 organizações (org1, org2, org3)
+- 3 clientes (servidores REST para org1, org2 e org3)
+Há também a opção de criar uma rede menor com menos entidades, com a seguinte configuração:
+
+- 1 chaincode (cc-tools-demo)
+- 1 organização (org)
+- 1 cliente (servidor REST para org)
+
+### Detalhes do Chaincode
+
+O chaincode fornecido em cc-tools-demo possui as seguintes características:
+
+- 3 ativos
+- 1 dado privado
+- 4 transações
+
+### Vendoring
+
+Tanto o chaincode quanto o CCAPI, em Golang, precisam ser vendored (download de pacotes de dependência) para funcionar corretamente.
+
+Para baixar as dependências do chaincode, execute o seguinte script:
+
+```bash
+sudo su
+
+cd chaincode && \
+go mod vendor && \
+cd ..
+```
+
+Para baixar as dependências do CCAPI, execute o seguinte script:
+
+```shell
+cd ccapi && \
+go mod vendor && \
+cd ..
+```
+
+## Construindo Sua Rede GoLedger CC-Tools
+Após instalar o ambiente e vendored os pacotes, a rede está pronta para ser instanciada.
+
+Este processo ocorre com o seguinte script:
+
+```shell
+docker stop $(docker ps -a -q)
+docker rm $(docker ps -a -q)
+
+
+sudo ./startDev.sh
+```
+
+## resultado:
+```shell
+root@matheuslazaro:/home/matheuslazaro/cc-tools-demo# docker ps
+CONTAINER ID        IMAGE                                                                                                                                                                            COMMAND                  CREATED             STATUS              PORTS                                                                                  NAMES
+fa07f5ee5064        ccapi_ccapi.org2.example.com                                                                                                                                                     "ccapi"                  31 seconds ago      Up 27 seconds       0.0.0.0:980->80/tcp, :::980->80/tcp                                                    ccapi.org2.example.com
+85935b0709ec        ccapi_ccapi.org1.example.com                                                                                                                                                     "ccapi"                  31 seconds ago      Up 27 seconds       0.0.0.0:80->80/tcp, :::80->80/tcp                                                      ccapi.org1.example.com
+56e39e2a7dd0        ccapi_ccapi.org3.example.com                                                                                                                                                     "ccapi"                  31 seconds ago      Up 27 seconds       0.0.0.0:1080->80/tcp, :::1080->80/tcp                                                  ccapi.org3.example.com
+865d6fc4fa13        dev-peer0.org2.example.com-cc-tools-demo_0.1-ad35f3aeaebff7f1a85d54190bedc12305e5174dadfd5e7f37c2acd2899ba0f5-acaee92dca401d559ef5fffb9293da80dc2c1037bfa339fd1f960bfaa09b523e   "chaincode -peer.add…"   4 minutes ago       Up 4 minutes                                                                                               dev-peer0.org2.example.com-cc-tools-demo_0.1-ad35f3aeaebff7f1a85d54190bedc12305e5174dadfd5e7f37c2acd2899ba0f5
+b01931643a3d        dev-peer0.org1.example.com-cc-tools-demo_0.1-ad35f3aeaebff7f1a85d54190bedc12305e5174dadfd5e7f37c2acd2899ba0f5-987f8a6269c23074f69cdc3a6ce4cf7f930df36a347df32233d6cddef6c2ea36   "chaincode -peer.add…"   4 minutes ago       Up 4 minutes                                                                                               dev-peer0.org1.example.com-cc-tools-demo_0.1-ad35f3aeaebff7f1a85d54190bedc12305e5174dadfd5e7f37c2acd2899ba0f5
+524452dafb2d        dev-peer0.org3.example.com-cc-tools-demo_0.1-ad35f3aeaebff7f1a85d54190bedc12305e5174dadfd5e7f37c2acd2899ba0f5-075bcab8b9f6ada602b979af826081ace251483c4065b44029e2a72c6079181d   "chaincode -peer.add…"   4 minutes ago       Up 4 minutes                                                                                               dev-peer0.org3.example.com-cc-tools-demo_0.1-ad35f3aeaebff7f1a85d54190bedc12305e5174dadfd5e7f37c2acd2899ba0f5
+7529ad2e7b04        hyperledger/fabric-tools:2.5.3                                                                                                                                                   "/bin/bash"              9 minutes ago       Up 9 minutes                                                                                               cli
+4f3d8e41dc98        hyperledger/fabric-peer:2.5.3                                                                                                                                                    "peer node start"        9 minutes ago       Up 9 minutes        0.0.0.0:7051->7051/tcp, :::7051->7051/tcp, 0.0.0.0:7053->7053/tcp, :::7053->7053/tcp   peer0.org1.example.com
+7dfd7f02aa44        hyperledger/fabric-peer:2.5.3                                                                                                                                                    "peer node start"        9 minutes ago       Up 9 minutes        0.0.0.0:8051->7051/tcp, :::8051->7051/tcp, 0.0.0.0:8053->7053/tcp, :::8053->7053/tcp   peer0.org2.example.com
+b2b23cf8ae28        hyperledger/fabric-peer:2.5.3                                                                                                                                                    "peer node start"        9 minutes ago       Up 9 minutes        0.0.0.0:9051->7051/tcp, :::9051->7051/tcp, 0.0.0.0:9053->7053/tcp, :::9053->7053/tcp   peer0.org3.example.com
+0f5bdaf29571        couchdb:3.1.1                                                                                                                                                                    "tini -- /docker-ent…"   9 minutes ago       Up 9 minutes        4369/tcp, 9100/tcp, 0.0.0.0:9984->5984/tcp, :::9984->5984/tcp                          couchdb2
+8c53cce6b41d        couchdb:3.1.1                                                                                                                                                                    "tini -- /docker-ent…"   9 minutes ago       Up 9 minutes        4369/tcp, 9100/tcp, 0.0.0.0:5984->5984/tcp, :::5984->5984/tcp                          couchdb0
+cc03cfcfa2a8        couchdb:3.1.1                                                                                                                                                                    "tini -- /docker-ent…"   9 minutes ago       Up 9 minutes        4369/tcp, 9100/tcp, 0.0.0.0:7984->5984/tcp, :::7984->5984/tcp                          couchdb1
+7af003b413c0        hyperledger/fabric-orderer:2.5.3                                                                                                                                                 "orderer"                9 minutes ago       Up 9 minutes        0.0.0.0:7050->7050/tcp, :::7050->7050/tcp, 0.0.0.0:7052->7052/tcp, :::7052->7052/tcp   orderer.example.com
+root@matheuslazaro:/home/matheuslazaro/cc-tools-demo# 
+
+```
+
+Este script realizará as seguintes tarefas:
+
+* Limpar imagens e volumes Docker não utilizados
+* Gerar os certificados MSP para cada organização
+* Criar os containers do nó Blockchain (peers e orderers do Hyperledger Fabric) para 3 organizações (org1, org2, org3) com a configuração criptográfica correta para cada uma delas
+* Criar o ledger para registro e permissão - Canal Hyperledger Fabric
+* Entradas de organizações no canal (processo de adesão no Hyperledger Fabric)
+* Instalação do chaincode nos endorsing peers
+* Instalação da API de gerenciamento de rede Hyperledger Fabric
+* Instantiação do chaincode no canal
+* Implantação de containers de servidores REST com a configuração criptográfica correta, representando um Cliente Hyperledger Fabric para cada organização
+
+Ao final do processo, as seguintes mensagens devem ser exibidas:
+
+```txt
+Chaincode definition committed on channel 'mainchannel'
+
+...
+
+Query chaincode definition successful on peer0.org1 on channel 'mainchannel'
+
+...
+
+Query chaincode definition successful on peer0.org2 on channel 'mainchannel'
+
+...
+
+Query chaincode definition successful on peer0.org3 on channel 'mainchannel'
+Chaincode initialization is not required
+[+] Running 3/3
+ ⠿ Container ccapi.org2.example.com  Started                        0.3s
+ ⠿ Container ccapi.org1.example.com  Started                        0.5s
+ ⠿ Container ccapi.org3.example.com  Started                        0.5s
+
+```
+
+Os containers ccapi representam os servidores REST para cada organização. Eles podem levar alguns minutos para ficarem online.
+
+Ao final, a seguinte mensagem deve aparecer:
+
+```txt
+docker logs ccapi.org1.example.com 
+
+2023/07/27 14:00:53 Escutando na porta 80
+2023/07/27/14:00:53 SDK criado a partir de './config/configsdk-org1.yaml'
+2023/07/27/14:00:53 SDK criado a partir de './config/configsdk-org1.yaml'
+Escutando na porta 80
+
+```
+
+Para instanciar a rede mínima usando apenas uma organização, use o seguinte comando:
+
+```shell
+./startDev.sh -n 1
+```
+
+## Atualizando Seu Chaincode
+Atualizar um smart contract pode ser feito facilmente em chaincodes que usam a biblioteca GoLedger CC-Tools.
+
+Primeiro, você deve verificar a sintaxe do código modificado.
+
+```shell
+cd chaincode \
+go vet \
+cd ..
+```
+
+Após a validação, a atualização do chaincode é feita com o script upgradeCC.sh, que recebe a versão do chaincode e a sequência como argumentos.
+
+NOTA:
+
+Um chaincode deve sempre ser atualizado com uma versão diferente de todas as versões anteriores e a sequência deve ser sequencial da anterior.
+
+Exemplo:
+
+```shell
+./upgradeCC.sh 0.2 2
+```
+
+Ou se estiver usando a rede mínima:
+
+```shell
+./upgradeCC.sh 0.2 2 -n 1
+```
+
+## Recarregando o CCAPI
+Se houver alterações no código do CCAPI, você deve recarregá-lo para que as alterações tenham efeito.
+
+Primeiro, verifique a sintaxe do código modificado.
+
+```shell
+cd ccapi \
+go vet \
+cd ..
+```
+
+Após a validação, o script reloadCCAPI.sh pode ser usado para recarregar o servidor REST.
+
+```shell
+./reloadCCAPI.sh
+```
+
+Ou se estiver usando a rede mínima:
+
+```shell
+./reloadCCAPI.sh -n 1
+```
+
+## Renomeando Seu Projeto
+Após testar cc-tools-demo e instanciar sua primeira rede Fabric, você está pronto para começar a desenvolver seu primeiro chaincode.
+
+Para usar seu próprio nome de projeto, em vez de cc-tools-demo, o script renameProject.sh está disponível para renomear todas as menções a ele na pasta do projeto. O script aceita o novo nome como argumento.
+
+Exemplo:
+```shell
+./renameProject.sh my-first-chaincode
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Definição de Ativos
 
