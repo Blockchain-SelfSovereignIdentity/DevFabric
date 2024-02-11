@@ -1,6 +1,22 @@
 # CC-Tools
+
+## Sumário
+
+- [Getting Started](#getting-started)
+- [Tutoriais](#tutoriais)
+- [Assets](#assets)
+- [Datatypes](#datatypes)
+- [Events](#events)
+- [Transactions](#transactions)
+- [Ferramentas Externas](#ferramentas-externas)
+- [Testes](#testes)
+- [Godog Testes e Testes de Golang para o Chaincode do Hyperledger Fabric](#godog-testes-e-testes-de-golang-para-o-chaincode-do-hyperledger-fabric)
+
+<hr/>
+
 # Getting Started
 # GoLedger CC-Tools
+
 
 O GoLedger CC-Tools é uma biblioteca desenvolvida para ser utilizada no sistema operacional Linux.
 
@@ -246,6 +262,8 @@ Este processo ocorre com o seguinte script:
 docker stop $(docker ps -a -q)
 docker rm $(docker ps -a -q)
 
+docker kill $(docker ps -q) # Limpar docker
+
 
 sudo ./startDev.sh
 ```
@@ -387,7 +405,7 @@ Para usar seu próprio nome de projeto, em vez de cc-tools-demo, o script rename
 
 Exemplo:
 ```shell
-./renameProject.sh my-first-chaincode
+sudo ./renameProject.sh my-first-chaincode
 ```
 
 
@@ -1585,3 +1603,589 @@ A plataforma pode ser acessada pelo seguinte link: https://gofabric.io e possui 
 * Adição de organizações
 * Instantiação ou atualização de Servidores Rest
 * Geração automática de código através dos Templates GoLedger
+
+
+# Testes
+
+O GoLedger CC-Tools oferece diferentes maneiras de testar o código-fonte no modo de desenvolvimento.
+
+Para verificar a sintaxe do GoLang, execute o seguinte comando:
+
+```bash
+cd chaincode \
+go vet
+```
+
+Após a instância ou atualização bem-sucedida do código, você pode verificar os logs diretamente dentro dos contêineres de execução do chaincode. Esses contêineres podem ser identificados iniciando com dev.
+
+```shell
+docker logs dev-peer0.org1.example.com-cc-tools-demo-0.1
+```
+
+## Usando o cc-webclient
+Para realizar testes e integrações de maneira satisfatória, é sugerido o uso da ferramenta cc-webclient. Após concluir as etapas, execute os seguintes comandos para criar 3 aplicativos para se conectar às organizações 1, 2 e 3.
+
+```shell
+./run-cc-web.sh 8080 & \
+./run-cc-web.sh 8090 & \
+./run-cc-web.sh 8100 &
+```
+
+## Configurando rest-server e cc-webclient
+Após a execução dos contêineres do cc-webclient, os aplicativos podem ser acessados diretamente através das portas definidas no script, por exemplo, 8080, 8090, 8100.
+
+Ao acessar o cc-webclient pelo navegador, a configuração do endereço do servidor rest pode ser feita clicando no ícone da ferramenta.
+
+## Configuração
+Os acessos podem ser feitos com as seguintes configurações:
+
+* org1: http://localhost:80
+* org2: http://localhost:980
+* org3: http://localhost:1080
+
+## Barra lateral
+O aplicativo cc-webclient possui uma barra lateral que mostra os ativos disponíveis, bem como as transações registradas no chaincode.
+
+## Uso de endpoints
+O uso do endpoint do rest-server é mostrado usando os botões CURL.
+
+## CURL
+Para cada tela, você pode verificar o uso do endpoint pressionando o botão curl.
+
+Por exemplo, na tela de criação de ativos:
+
+## CURL
+## Listar, criar, editar, excluir ou verificar o histórico de um ativo
+
+Para listar cada ativo, basta selecionar um ativo na barra lateral.
+
+## Listar Ativo
+Ao selecionar o botão CRIAR na janela de lista de ativos, aparecerá uma tela de criação de ativos.
+
+Por exemplo, para o ativo Pessoa.
+
+## Criar Ativo
+A tela de edição é acessada selecionando o ícone de edição na janela de lista de ativos.
+
+A remoção de um ativo é solicitada selecionando o ícone de exclusão na janela de lista de ativos.
+
+O histórico de um ativo (todas as alterações registradas no livro-razão) pode ser visualizado selecionando o ícone de histórico na janela de um ativo.
+
+## Executando uma transação
+A execução de uma transação pode ser realizada selecionando a transação na barra lateral.
+
+Por exemplo, para a transação UpdateBookTenant.
+
+## Transação
+## Usando Godog
+Godog é o framework oficial de BDD Cucumber para Golang. Ele segue os princípios do BDD, que enfatiza a definição do comportamento desejado do software por meio de cenários focados no usuário escritos em linguagem natural. Esses cenários são escritos em um formato Given-When-Then, facilitando para os membros da equipe não técnicos entenderem e contribuírem para o processo de teste.
+
+Para o repositório cc-tools-demo, existem testes godog para cada transação. Cada transação é representada como um recurso e cada recurso tem cenários a serem testados.
+
+Os recursos são definidos na pasta chaincode/tests/features.
+
+```shell
+chaincode/
+  tests/
+    features/
+      createNewLibrary.feature              # definição do recurso Criar Nova Biblioteca
+      getBooksByAuthor.feature              # definição do recurso Obter Livros por Autor
+      getNumberOfBooksFromLibrary.feature   # definição do recurso Obter Número de Livros da Biblioteca
+      updateBookTenant.feature              # definição do recurso Atualizar Inquilino do Livro
+    request_test.go                         # implementação de etapas para cenários
+```
+
+## Definição de Recurso
+No arquivo de recurso, comece definindo o recurso usando a palavra-chave Feature seguida de uma breve descrição. Cada cenário dentro do recurso é definido usando a palavra-chave Scenario, seguida de um título ou descrição do cenário. Os cenários representam casos específicos ou situações que você deseja testar. Dentro de cada cenário, você define as etapas do teste usando as palavras-chave Given, When e Then. Essas etapas descrevem as precondições (Given), ações (When) e resultados esperados (Then) do cenário. Opcionalmente, você também pode usar And e But para esclarecer ou adicionar etapas adicionais.
+
+Para mais informações sobre Godog/Cucumber, consulte Godog/Cucumber.
+
+## Exemplos de Recursos
+A definição do recurso Criar Nova Biblioteca é a seguinte:
+
+```gherkin
+Feature: Criar Nova Biblioteca
+  Com o objetivo de criar uma nova biblioteca
+  Como um cliente da API
+  Eu quero fazer uma solicitação com o nome da biblioteca desejada
+
+  Scenario: Criar uma nova biblioteca
+      Given there is a running "" test network from scratch
+      When I make a "POST" request to "/api/invoke/createNewLibrary" on port 880 with:
+          """
+          {
+              "name": "Biblioteca da Elizabeth"
+          }
+          """
+      Then the response code should be 200
+      And the response should have:
+          """
+          {
+              "@key":         "library:9cf6726a-a327-568a-baf1-5881393073bf",
+              "@lastTouchBy": "orgMSP",
+              "@lastTx":      "createNewLibrary",
+              "@assetType":   "library",
+              "name":         "Biblioteca da Elizabeth"
+          }
+          """
+Cenário: Tentar criar uma nova biblioteca com um nome que já existe Dado que existe uma rede de teste “” em execução Dado que existe uma biblioteca com o nome “John’s Library” Quando eu faço uma requisição “POST” para “/api/invoke/createNewLibrary” na porta 880 com: “”" { “nome”: “John’s Library” } “”" Então o código de resposta deve ser 409
+
+
+Esse recurso testa a capacidade de criar uma nova biblioteca usando a transação createNewLibrary através da API. Ele consiste em dois cenários: um caso de sucesso e outro testa ao tentar criar uma biblioteca com um nome que já existe.
+
+Cenário 1: Este cenário representa a criação bem-sucedida de uma nova biblioteca. Ele verifica se a API pode lidar corretamente com a solicitação com um novo nome de biblioteca e retorna a resposta esperada.
+
+Cenário 2: Este cenário testa o caso ao tentar criar uma biblioteca com um nome que já existe no sistema. Ele verifica se a API responde com o código de status apropriado (409) para indicar um conflito.
+
+A definição do recurso Obter Livros por Autor é a seguinte:
+
+```gherkin
+Feature: Obter Livros por Autor
+  Com o objetivo de obter todos os livros de um autor
+  Como um cliente da API
+  Eu quero fazer uma solicitação à transação getBooksByAuthor
+  E receber os livros apropriados
+
+  Scenario: Solicitar um autor com vários livros
+      Given there is a running "" test network
+      And there are 3 books with prefix "book" by author "Jack"
+      When I make a "GET" request to "/api/query/getBooksByAuthor" on port 880 with:
+          """
+          {
+              "authorName": "Jack"
+          }
+          """
+      Then the response code should be 200
+      And the "result" field should have size 3
+
+  ...
+
+
+```
+
+Este recurso testa a capacidade de recuperar livros escritos por um autor específico usando a transação getBooksByAuthor através da API. Ele consiste em três cenários que abrangem diferentes casos com base no número de livros do autor solicitado.
+
+Cenário 1: Este cenário verifica se a API pode lidar com sucesso com uma solicitação para um autor que possui vários livros no sistema. Ele verifica se a API retorna o código de resposta correto (200) e se o campo "result" na resposta contém todos os livros do autor com um tamanho de 3.
+
+A definição do recurso Obter Número de Livros da Biblioteca é a seguinte:
+
+```gherkin
+Feature: Obter Número de Livros da Biblioteca
+  Com o objetivo de obter o número de livros de uma biblioteca
+  Como um cliente da API
+  Eu quero fazer uma solicitação
+
+  Scenario: Consultar Obter Número de Livros da Biblioteca que existe
+      Given there is a running "" test network
+      And I make a "POST" request to "/api/invoke/createAsset" on port 880 with:
+          """
+          {
+              "asset": [
+                  {
+                      "@assetType": "book",
+                      "title":      "Meu Nome é Maria",
+                      "author":     "Maria Viana"
+                  }
+              ]
+          }
+          """
+      And I make a "POST" request to "/api/invoke/createAsset" on port 880 with:
+          """
+          {
+              "asset": [{
+                  "@assetType": "library",
+                  "name": "Biblioteca da Maria",
+                  "books": [
+                      {
+                          "@assetType": "book",
+                          "@key": "book:a36a2920-c405-51c3-b584-dcd758338cb5"
+                      }
+                  ]
+              }]
+        }
+          """
+      When I make a "GET" request to "/api/query/getNumberOfBooksFromLibrary" on port 880 with:
+          """
+          {
+              "library": {
+                  "@key": "library:3cab201f-9e2b-579d-b7b2-72297ed17f49",
+                  "@assetType": "library"
+          }
+          }
+          """
+      Then the response code should be 200
+      And the response should have:
+          """
+          {
+              "numberOfBooks": 1.0
+          }
+          """
+
+```
+
+Este recurso testa a capacidade de recuperar o número de livros de uma biblioteca por meio da API. Ele consiste em dois cenários: um cenário lida com a consulta de uma biblioteca que existe e possui livros, enquanto o outro cenário testa a consulta de uma biblioteca que não existe.
+
+Cenário 1: Este cenário verifica se a API pode recuperar com sucesso o número de livros de uma biblioteca que existe no sistema. Primeiro, cria um novo livro e uma biblioteca com o livro associado. Em seguida, consulta o número de livros da biblioteca e verifica se a API retorna o código de resposta correto (200) e se a resposta contém o número esperado de livros (1).
+
+Cenário 2: Este cenário testa o caso ao tentar consultar o número de livros de uma biblioteca que não existe no sistema. Verifica se a API retorna o código de resposta apropriado (400) para indicar uma solicitação inválida devido à biblioteca inexistente.
+
+A definição do recurso Atualizar Inquilino do Livro é a seguinte:
+
+```gherkin
+Feature: Atualizar Inquilino do Livro
+  Com o objetivo de atualizar o inquilino de um livro
+  Como um cliente da API
+  Eu quero fazer uma solicitação
+
+  Scenario: Atualizar livro com um inquilino existente 
+      # As primeiras 3 declarações serão usadas por todos os cenários neste recurso
+      Given there is a running "" test network
+      And I make a "POST" request to "/api/invoke/createAsset" on port 880 with:
+          """
+          {
+              "asset": [{
+                      "@assetType": "book",
+                      "title":      "Meu Nome é Maria",
+                      "author":     "Maria Viana"
+                  }]
+          }
+          """
+      And I make a "POST" request to "/api/invoke/createAsset" on port 880 with:
+          """
+         {
+              "asset": [{
+                  "@assetType": "person",
+                  "name": "Maria",
+                  "id": "31820792048"
+              }]
+        }
+          """
+      When I make a "PUT" request to "/api/invoke/updateBookTenant" on port 880 with:
+          """
+          {
+              "book": {
+                  "@assetType": "book",
+                  "@key": "book:a36a2920-c405-51c3-b584-dcd758338cb5"
+          },
+              "tenant": {
+                  "@assetType": "person",
+                  "@key": "person:47061146-c642-51a1-844a-bf0b17cb5e19"
+              }
+          }
+          """
+      Then the response code should be 200
+      And the response should have:
+          """
+          {
+              "@key": "book:a36a2920-c405-51c3-b584-dcd758338cb5",
+              "@lastTouchBy": "orgMSP",
+              "@lastTx": "updateBookTenant",
+              "currentTenant": {
+            "@assetType": "person",
+            "@key": "person:47061146-c642-51a1-844a-bf0b17cb5e19"
+          }
+          }
+          """
+
+```
+
+Este recurso testa a capacidade de atualizar o inquilino de um livro usando a API. Ele consiste em dois cenários: um cenário lida com a atualização de um livro com um inquilino existente, e o outro cenário testa a atualização de um livro com um inquilino que não existe.
+
+Cenário 1: Este cenário verifica se a API pode atualizar com sucesso o inquilino de um livro com um inquilino existente. Cria um novo livro e uma nova pessoa (inquilino), associa a pessoa ao livro e, em seguida, faz uma solicitação PUT para atualizar o inquilino do livro. O cenário verifica se a API retorna o código de resposta correto (200) e se o inquilino do livro é atualizado corretamente na resposta.
+
+Cenário 2: Este cenário testa o caso ao tentar atualizar o inquilino de um livro com um inquilino que não existe no sistema. Faz uma solicitação PUT para atualizar o inquilino do livro com o inquilino inexistente. O cenário verifica se a API retorna o código de resposta apropriado (404) para indicar que o inquilino não existe no sistema.
+
+A implementação de etapas
+Cada etapa é implementada no arquivo chaincode/tests/request_test.go.
+
+Para Given there is a running "" test network from scratch, há a seguinte implementação:
+
+```go
+func thereIsARunningTestNetworkFromScratch(arg1 string) error {
+    // Iniciar a rede de teste com apenas 1 organização
+    cmd := exec.Command("../../startDev.sh", "-n", "1")
+
+    _, err := cmd.Output()
+
+    if err != nil {
+        fmt.Println(err.Error())
+        return err
+    }
+
+    // Aguardar o ccapi
+    err = waitForNetwork("880")
+    if err != nil {
+        fmt.Println(err.Error())
+        return err
+    }
+
+    return nil
+}
+
+```
+
+Esta função inicia uma rede de teste a partir do zero com uma única organização. Executa um comando shell ../../startDev.sh -n 1 para iniciar a rede de teste. Após iniciar a rede, aguarda a disponibilidade do ccapi na porta 880 usando a função waitForNetwork.
+
+Para When I make a "[method]" request to "[endpoint]" on port [port] with "[body]", há a seguinte implementação:
+
+```go
+func iMakeARequestToOnPortWith(ctx context.Context, method, endpoint string, port int, reqBody *godog.DocString) (context.Context, error) {
+    var res *http.Response
+    var req *http.Request
+    var err error
+
+    // Inicializar cliente http
+    client := &http.Client{}
+
+    // Criar solicitação
+    if method == "GET" {
+        b64str := b64.StdEncoding.EncodeToString([]byte(reqBody.Content))
+        reqParam := "?@request=" + b64str
+        req, err = http.NewRequest("GET", "http://localhost:"+strconv.Itoa(port)+endpoint+reqParam, nil)
+        if err != nil {
+            return ctx, err
+        }
+    } else {
+        dataAsBytes := bytes.NewBuffer([]byte(reqBody.Content))
+
+        req, err = http.NewRequest(method, "http://localhost:"+strconv.Itoa(port)+endpoint, dataAsBytes)
+        if err != nil {
+            return ctx, err
+        }
+    }
+
+    // Definir cabeçalho e fazer a solicitação
+    req.Header.Set("Content-Type", "application/json")
+    res, err = client.Do(req)
+    if err != nil {
+        return ctx, err
+    }
+
+    // Obter código de status e corpo da resposta
+    statusCode := res.StatusCode
+    resBody, err := ioutil.ReadAll(res.Body)
+
+    if err != nil {
+        return ctx, err
+    }
+    res.Body.Close()
+
+    // Adicionar código de status e corpo da resposta ao contexto
+    bodyCtx := context.WithValue(ctx, bodyCtxKey{}, resBody)
+    statusCtx := context.WithValue(bodyCtx, statusCtxKey{}, statusCode)
+    return statusCtx, nil
+}
+
+```
+
+Esta função faz uma solicitação HTTP a um endpoint específico em uma porta fornecida. A função suporta métodos GET e POST. Se o método for GET, o corpo da solicitação será codificado em base64 e adicionado como um parâmetro de consulta. Se o método for POST, o corpo da solicitação será incluído na solicitação como dados JSON.
+
+Para Then the response code should be [code], há a seguinte implementação:
+
+```go
+func theResponseCodeShouldBe(ctx context.Context, expectedCode int) (context.Context, error) {
+    // Obter código de status do contexto
+    statusCode, ok := ctx.Value(statusCtxKey{}).(int)
+    if !ok {
+        return ctx, errors.New("contexto indisponível ao recuperar status")
+    }
+
+    if statusCode != expectedCode {
+        // Obter corpo da resposta do contexto
+        resBody, ok := ctx.Value(bodyCtxKey{}).([]byte)
+        if !ok {
+            return ctx, errors.New("contexto indisponível ao recuperar corpo")
+        }
+
+        // Teste falhou
+        return ctx, fmt.Errorf("recebeu uma resposta de status incorreta. Recebido %d Esperado: %d\nCorpo da resposta: %s", statusCode, expectedCode, string(resBody))
+    }
+
+    return ctx, nil
+}
+
+```
+
+Esta função verifica se o código de status da resposta HTTP recebida corresponde ao código esperado.
+
+Para And the response should have, há a seguinte implementação:
+
+```go
+func theResponseShouldHave(ctx context.Context, body *godog.DocString) error {
+    // Obter 'ResponseBody' do contexto
+    respBody, ok := ctx.Value(bodyCtxKey{}).([]byte)
+    if !ok {
+        return errors.New("contexto indisponível")
+    }
+
+    var expected map[string]interface{}
+    var received map[string]interface{}
+
+    if err := json.Unmarshal([]byte(body.Content), &expected); err != nil {
+        return err
+    }
+    if err := json.Unmarshal(respBody, &received); err != nil {
+        return err
+    }
+
+    for key, value := range expected {
+        if !reflect.DeepEqual(value, received[key]) {
+            var expectedBytes []byte
+            var receivedBytes []byte
+            var err error
+            if expectedBytes, err = json.MarshalIndent(value, "", "  "); err != nil {
+                return err
+            }
+            if receivedBytes, err = json.MarshalIndent(received[key], "", "  "); err != nil {
+                return err
+            }
+
+            return fmt.Errorf("Esperava que %s fosse igual a %s, mas recebeu %s", key, expectedBytes, receivedBytes)
+        }
+    }
+
+    return nil
+}
+
+```
+
+# Godog Testes e Testes de Golang para o Chaincode do Hyperledger Fabric
+
+## Verificação de Resposta HTTP em Godog
+
+Esta função verifica se o corpo da resposta HTTP recebida corresponde ao corpo de resposta esperado definido na etapa do cenário Godog. Primeiro, ela obtém o corpo de resposta real e o corpo de resposta esperado do contexto. Deserializa ambas as strings JSON em estruturas semelhantes a mapas para facilitar a comparação. A função realiza uma comparação profunda entre o valor de cada chave nos corpos de resposta esperados e recebidos usando a função `reflect.DeepEqual`.
+
+### Para "O campo [field] deve ter tamanho [size]"
+
+```go
+func theFieldShouldHaveSize(ctx context.Context, field string, expectedSize int) (context.Context, error) {
+    // Obter 'ResponseBody' do contexto
+    respBody, ok := ctx.Value(bodyCtxKey{}).([]byte)
+    if !ok {
+        return ctx, errors.New("contexto indisponível")
+    }
+
+    var bodyMap map[string]interface{}
+
+    if err := json.Unmarshal(respBody, &bodyMap); err != nil {
+        return ctx, err
+    }
+
+    resultField, ok := bodyMap[field]
+    if !ok {
+        return ctx, errors.New("campo não disponível no corpo da resposta")
+    }
+
+    fieldLen := len(resultField.([]interface{}))
+    if fieldLen != expectedSize {
+        // Teste Falhou
+        return ctx, fmt.Errorf("tamanho do campo recebido incorreto no corpo da resposta. Recebido %d, Esperado: %d\nCorpo da resposta: %s", fieldLen, expectedSize, string(respBody))
+    }
+
+    return ctx, nil
+}
+```
+
+Esta função é usada para verificar se um campo específico no corpo da resposta JSON recebido tem o tamanho esperado (número de elementos). Geralmente, é usada em cenários Godog para verificar o tamanho de uma matriz ou campo semelhante a uma lista na resposta.
+
+Para "Existem [número] livros com prefixo "[prefixo]" do autor "[nome]"
+
+```go
+func thereAreBooksWithPrefixByAuthor(ctx context.Context, nBooks int, prefix string, author string) (context.Context, error) {
+    // Implementação...
+}
+
+```
+
+Esta função é usada para garantir que exista um número específico de livros com um determinado prefixo e autor no sistema. Geralmente, é usada em cenários Godog para configurar os dados de teste necessários antes de executar testes que envolvem livros e autores.
+
+Para "Dado que existe uma biblioteca com o nome "[nome]"
+
+```go
+func thereIsALibraryWithName(ctx context.Context, name string) (context.Context, error) {
+    // Implementação...
+}
+
+```
+
+Esta função é usada para garantir que uma biblioteca com um nome específico exista no sistema. Geralmente, é usada em cenários Godog para configurar os dados de teste necessários antes de executar testes que envolvem bibliotecas. Se a biblioteca não existir, ela cria um novo ativo de biblioteca.
+
+É necessário inicializar o cenário com a implementação de cada etapa. A função abaixo descreve como fazer isso:
+
+```go
+func InitializeScenario(ctx *godog.ScenarioContext) {
+    // Implementação das etapas Godog...
+}
+
+```
+
+## Executando Testes Godog
+Comece instalando o Godog usando o seguinte comando:
+
+```shell
+$ go install github.com/cucumber/godog/cmd/godog@latest
+```
+
+Depois de instalar com sucesso o Godog, utilize o script fornecido para executar os testes facilmente:
+
+```shell
+$ ./godog.sh
+```
+
+## Usando Testes Golang
+Também é possível testar as transações desenvolvidas usando a biblioteca de testes Golang. Este tipo de teste permite simular uma chamada de transação e comparar seus resultados com um valor esperado.
+
+É importante observar que esse tipo de teste não funciona em transações que leem o banco de dados de estado do chaincode (como consultas couchdb) nem transações que leem o histórico de um ativo.
+
+Para o repositório cc-tools-demo, existem testes para as transações createNewLibrary, getNumberOfBooksFromLibrary e updateBookTenant.
+
+Os testes estão definidos na pasta chaincode/:
+
+* **main_test.go**: Configuração do ambiente de teste.
+* **txdefs_createNewLibrary_test**.go: Testa a transação createNewLibrary.
+* **txdefs_getNumberOfBooksFromLibrary_test.go**: Testa a transação getNumberOfBooksFromLibrary.
+* **txdefs_updateBookTenant_test.go**: Testa a transação updateBookTenant.
+
+## Exemplos de Teste
+A definição do teste Create New Library é a seguinte:
+
+```go
+func TestCreateNewLibrary(t *testing.T) {
+    // Implementação...
+}
+
+```
+
+Os seguintes passos ocorrem neste teste:
+
+* Um mock stub para org3 é criado.
+* Os objetos com a resposta esperada para a transação createNewLibrary e a solicitação da transação são criados.
+* A transação createNewLibrary é invocada usando a solicitação definida na etapa anterior.
+* O carimbo de data/hora do stub é adicionado ao objeto expectedResponse.
+* O status da invocação é verificado para o código 200.
+* Uma comparação profunda é feita entre o objeto de resposta esperado e a resposta da invocação.
+* O estado para a chave do objeto criado no stub também é comparado com a resposta esperada.
+
+Os demais testes seguem uma lógica semelhante.
+
+## Executando os Testes
+Para executar os testes, execute o seguinte comando:
+
+```sh
+cd chaincode && \
+go test && \
+cd ..
+
+```
+
+Se os testes foram bem-sucedidos, as seguintes mensagens devem aparecer no terminal:
+
+```go
+main.go:131: 200 init 40.796µs 
+main.go:131: 200 getNumberOfBooksFromLibrary 31.298µs 
+main.go:131: 200 updateBookTenant 136.09µs 
+main.go:131: 200 createNewLibrary 60.794µs 
+PASS
+ok      github.com/hyperledger-labs/cc-tools-demo/chaincode  0.006s
+
+```
