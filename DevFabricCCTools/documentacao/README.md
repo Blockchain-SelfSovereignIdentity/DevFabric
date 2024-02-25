@@ -90,6 +90,12 @@ matheuslazaro@matheusLazaro:~$ sudo apt-get install containerd
 matheuslazaro@matheusLazaro:~$ echo $USER
 matheuslazaro@matheusLazaro:~$ docker --version
 Docker version 24.0.5, build 24.0.5-0ubuntu1~22.04.1
+
+sudo groupadd docker
+sudo usermod -aG docker $USER
+newgrp docker
+docker run hello-world
+
 matheuslazaro@matheusLazaro:~$ docker ps
 CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
 
@@ -148,6 +154,12 @@ Se estiver usando o Linux Ubuntu, execute o seguinte comando a partir do diretó
 
 ```shell
 sudo ./scripts/installPreReqUbuntu.sh
+
+sudo systemctl start docker
+sudo groupadd docker
+sudo usermod -aG docker $USER
+newgrp docker
+docker run hello-world
 ```
 
 Ver se é necessário:
