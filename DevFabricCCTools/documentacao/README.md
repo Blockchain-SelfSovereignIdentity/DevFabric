@@ -96,6 +96,15 @@ sudo usermod -aG docker $USER
 newgrp docker
 docker run hello-world
 
+
+sudo chmod 666 /var/run/docker.sock
+ls -l /var/run/docker.sock
+sudo chown :docker /var/run/docker.sock
+sudo service docker stop
+sudo service docker start
+grep docker /etc/group
+
+
 matheuslazaro@matheusLazaro:~$ docker ps
 CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
 
@@ -129,6 +138,8 @@ docker-compose version 1.29.2, build 5becea4c
 #### Node.js 12.18.2 e npm 6.14.5(Versão suportada)
 * Instalação
 ```shell
+sudo rm -rf /usr/local/bin/node /usr/local/lib/node_modules
+
 sudo apt-get remove nodejs
 
 sudo apt-get install npm
@@ -273,6 +284,9 @@ Este processo ocorre com o seguinte script:
 ```shell
 docker stop $(docker ps -a -q)
 docker rm $(docker ps -a -q)
+
+docker image prune -a
+
 
 docker kill $(docker ps -q) # Limpar docker
 
@@ -2202,7 +2216,11 @@ ok      github.com/hyperledger-labs/cc-tools-demo/chaincode  0.006s
 
 ```
 
+```sh
+sudo npm install -g localtunnel
 
-npm install -g localtunnel
-
-lt --port 8080 --subdomain blockchain-stcs
+sudo lt --port 8080 --subdomain blockchain-stcs
+sudo lt --port 80 --subdomain org1-stcs
+sudo lt --port 980 --subdomain org2-stcs
+sudo lt --port 1080 --subdomain org3-stcs
+```
