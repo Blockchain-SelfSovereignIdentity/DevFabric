@@ -1613,6 +1613,10 @@ Imagem Docker que fornece uma aplicação web para testes.
 O container pode ser instanciado da seguinte forma:
 
 ```shell
+# Solução alternativa para erro de plataforma ARM64 (MAC) para AMD64 (Ubuntu)
+sudo apt install -y qemu qemu-system-x86 binfmt-support qemu-user-static
+docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
 docker run -p 0.0.0.0:8080:80/tcp --name cc-webclient goledger/cc-webclient:latest
 ```
 
