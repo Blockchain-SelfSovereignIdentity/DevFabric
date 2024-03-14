@@ -91,6 +91,7 @@ matheuslazaro@matheusLazaro:~$ echo $USER
 matheuslazaro@matheusLazaro:~$ docker --version
 Docker version 24.0.5, build 24.0.5-0ubuntu1~22.04.1
 
+sudo systemctl start docker
 sudo groupadd docker
 sudo usermod -aG docker $USER
 newgrp docker
