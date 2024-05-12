@@ -91,7 +91,6 @@ matheuslazaro@matheusLazaro:~$ echo $USER
 matheuslazaro@matheusLazaro:~$ docker --version
 Docker version 24.0.5, build 24.0.5-0ubuntu1~22.04.1
 
-sudo systemctl start docker
 sudo groupadd docker
 sudo usermod -aG docker $USER
 newgrp docker
@@ -129,6 +128,7 @@ export PATH=$PATH:/usr/local/bin
 export PATH=$PATH:/snap/bin
 
 # Atualizar biblioteca paramiko
+sudo apt-get install python-pip
 pip install --upgrade paramiko
 
 
@@ -148,6 +148,9 @@ sudo npm install -g n
 sudo rm /usr/bin/node
 sudo n 12.18.2
 sudo ln -s /usr/local/bin/node /usr/bin/node
+
+nvm install 12.18.2
+nvm use 12.18.2
 ```
 
 * Verificação:
@@ -176,6 +179,8 @@ docker run hello-world
 
 Ver se é necessário:
 ```go
+sudo su
+
 # Baixar o arquivo tarball do GoLang 1.14+
 wget https://dl.google.com/go/go1.14.3.linux-amd64.tar.gz
 
@@ -183,7 +188,7 @@ wget https://dl.google.com/go/go1.14.3.linux-amd64.tar.gz
 sudo tar -C /usr/local -xvf go1.14.3.linux-amd64.tar.gz
 
 # Adicionar o caminho /usr/local/go/bin à variável de ambiente PATH
-echo "export PATH=$PATH:/usr/local/go/bin" >> $HOME/.profile
+sudo echo "export PATH=$PATH:/usr/local/go/bin" >> $HOME/.profile
 
 # Recarregar o arquivo .profile para aplicar as mudanças
 source $HOME/.profile
@@ -283,13 +288,17 @@ Após instalar o ambiente e vendored os pacotes, a rede está pronta para ser in
 Este processo ocorre com o seguinte script:
 
 ```shell
-docker stop $(docker ps -a -q)
-docker rm $(docker ps -a -q)
+sudo docker stop $(docker ps -a -q)
+sudo docker rm $(docker ps -a -q)
 
-docker image prune -a
+sudo docker image prune -a
 
 
-docker kill $(docker ps -q) # Limpar docker
+sudo docker kill $(docker ps -q) # Limpar docker
+
+#docker rm -vf $(docker ps -aq)
+#docker rmi -f $(docker images -aq)
+#docker system prune -a --volumes
 
 
 sudo ./startDev.sh
